@@ -2,9 +2,217 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- Mobile scaling fix -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.15">
+
   <title>TFDi MD‑11 Interactive Checklist (Hybrid · MSFS 2024)</title>
-    <!-- PWA Manifest -->
+
+  <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070a;
+      --panel: #11141c;
+      --accent: #3fa9f5;
+      --accent-soft: #264766;
+      --text: #e5e9f0;
+      --muted: #9da5b4;
+      --danger: #ff6b6b;
+      --ok: #7bd88f;
+      --border: #262c3a;
+    }
+
+    /* Larger base font for mobile */
+    html {
+      font-size: 18px;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1b2838 0, #05070a 55%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1rem 1rem 2rem;
+    }
+
+    h1, h2, h3 {
+      margin: 0.4rem 0;
+      font-weight: 600;
+    }
+
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.2rem; }
+    h3 { font-size: 1.05rem; }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .phase {
+      background: rgba(10, 12, 18, 0.96);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+      background: linear-gradient(90deg, #151922, #10131a);
+    }
+
+    .phase-title span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .phase-badge {
+      font-size: 0.8rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .phase-toggle {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-left: 0.5rem;
+      transition: transform 0.15s ease;
+    }
+
+    .phase-body {
+      padding: 0.8rem 1rem 1rem;
+      display: none;
+    }
+
+    .phase.open .phase-body {
+      display: block;
+    }
+
+    .phase.open .phase-toggle {
+      transform: rotate(90deg);
+    }
+
+    .section {
+      margin-top: 0.6rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed #252b38;
+    }
+
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0.6rem;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.35rem 0.3rem;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .step:hover {
+      background: rgba(63, 169, 245, 0.08);
+    }
+
+    /* Larger checkboxes for touch screens */
+    .step input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      margin-top: 0.2rem;
+      accent-color: var(--accent);
+    }
+
+    .step-label {
+      font-size: 0.95rem;
+    }
+
+    .step-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .verify {
+      font-size: 0.85rem;
+      color: var(--ok);
+      margin-top: 0.2rem;
+    }
+
+    .verify span {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      margin-right: 0.25rem;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar button {
+      background: #151922;
+      color: var(--text);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      html { font-size: 19px; }
+      .phase-header { padding: 0.7rem 0.8rem; }
+      .phase-body { padding: 0.7rem 0.8rem 0.9rem; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <h1>TFDi MD‑11 Interactive Checklist</h1>
+  <div class="subtitle">MSFS 2024 · Hybrid (TFDi‑based) · Mobile‑optimized</div>
+
+  <div class="toolbar">
+    <div>
+      <button onclick="setAllPhases(true)">Expand all</button>
+      <button onclick="setAllPhases(false)">Collapse all</button>
+    </div>
+    <button onclick="resetAll()">Reset checkboxes</button>
+  </div>
   <style>
     :root {
       color-scheme: dark;
@@ -1528,6 +1736,7 @@
   </div>
 
 </div>
+</div>
 
 <script>
   function togglePhase(headerEl) {
@@ -1547,6 +1756,12 @@
       cb.checked = false;
     });
   }
+
+  // Register service worker
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./service-worker.js");
+  }
 </script>
+
 </body>
 </html>
