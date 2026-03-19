@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TFDi MD‑11 Interactive Checklist (Hybrid · MSFS 2024)</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070a;
+      --panel: #11141c;
+      --accent: #3fa9f5;
+      --accent-soft: #264766;
+      --text: #e5e9f0;
+      --muted: #9da5b4;
+      --danger: #ff6b6b;
+      --ok: #7bd88f;
+      --border: #262c3a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1b2838 0, #05070a 55%);
+      color: var(--text);
+    }
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1rem 1rem 2rem;
+    }
+    h1, h2, h3 {
+      margin: 0.4rem 0;
+      font-weight: 600;
+    }
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.1rem; }
+    h3 { font-size: 1rem; }
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+    .phase {
+      background: rgba(10, 12, 18, 0.96);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 0.9rem;
+      overflow: hidden;
+    }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+      background: linear-gradient(90deg, #151922, #10131a);
+    }
+    .phase-title {
+      display: flex;
+      flex-direction: column;
+    }
+    .phase-title span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .phase-badge {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+    }
+    .phase-toggle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-left: 0.5rem;
+      transition: transform 0.15s ease;
+    }
+    .phase-body {
+      padding: 0.6rem 0.8rem 0.8rem;
+      display: none;
+    }
+    .phase.open .phase-body {
+      display: block;
+    }
+    .phase.open .phase-toggle {
+      transform: rotate(90deg);
+    }
+    .section {
+      margin-top: 0.4rem;
+      padding-top: 0.4rem;
+      border-top: 1px dashed #252b38;
+    }
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.2rem;
+    }
+    .section-header small {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 0.2rem 0 0.4rem;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      padding: 0.25rem 0.2rem;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+    .step:hover {
+      background: rgba(63, 169, 245, 0.08);
+    }
+    .step input[type="checkbox"] {
+      margin-top: 0.15rem;
+      accent-color: var(--accent);
+    }
+    .step-main {
+      flex: 1;
+    }
+    .step-label {
+      font-size: 0.85rem;
+    }
+    .step-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .verify {
+      font-size: 0.78rem;
+      color: var(--ok);
+      margin-top: 0.1rem;
+    }
+    .verify span {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      margin-right: 0.25rem;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.2rem;
+    }
+    .pill {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid #2c3444;
+      color: var(--muted);
+    }
+    .danger { color: var(--danger); }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .toolbar button {
+      background: #151922;
+      color: var(--text);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .toolbar button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .toolbar span {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    @media (max-width: 600px) {
+      .app { padding: 0.6rem 0.5rem 1.2rem; }
+      .phase-header { padding: 0.5rem 0.6rem; }
+      .phase-body { padding: 0.5rem 0.6rem 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>TFDi MD‑11 Interactive Checklist</h1>
+  <div class="subtitle">MSFS 2024 · Hybrid (TFDi‑based) · Checklist + short notes</div>
+
+  <div class="toolbar">
+    <div>
+      <button type="button" onclick="setAllPhases(true)">Expand all</button>
+      <button type="button" onclick="setAllPhases(false)">Collapse all</button>
+    </div>
+    <div>
+      <button type="button" onclick="resetAll()">Reset checkboxes</button>
+    </div>
+  </div>
+
+  <!-- PHASE 1: COCKPIT SAFETY CHECK -->
+  <div class="phase open">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 1 — Cockpit safety check</h2>
+        <span>Initial safety and power‑off condition</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Safety</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>1.1 Aircraft condition</h3>
+          <small>Parking / chocks</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Parking brake — <strong>SET</strong></div>
+              <div class="step-note">Ensure aircraft is held before power‑up.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Wheel chocks — <strong>IN PLACE</strong> (if available)</div>
+              <div class="step-note">Extra security at the stand.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>1.2 Controls & switches</h3>
+          <small>Safe positions</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Thrust levers — <strong>IDLE / SHUTOFF</strong></div>
+              <div class="step-note">No thrust on power‑up.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Speedbrake lever — <strong>DOWN</strong></div>
+              <div class="step-note">Spoilers retracted.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Flap lever — <strong>UP</strong></div>
+              <div class="step-note">Clean configuration.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>1.3 Gear & panel</h3>
+          <small>Basic checks</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Landing gear lever — <strong>DOWN</strong></div>
+              <div class="step-note">Confirm down‑locked indication.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Battery switches — <strong>OFF</strong> (if arriving to cold & dark)</div>
+              <div class="step-note">Confirms true cold & dark state.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: POWER-UP / PRELIMINARY PREFLIGHT -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 2 — Power‑up & preliminary preflight</h2>
+        <span>Electrical power, basic system bring‑up</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Power‑up</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>2.1 Electrical power</h3>
+          <small>ELEC / APU</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Battery switches 1 &amp; 2 — <strong>ON</strong></div>
+              <div class="step-note">Energizes essential DC buses.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">External power — <strong>CONNECT</strong> (if available)</div>
+              <div class="step-note">Preferred for stable initialization.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">If no EXT PWR: APU — <strong>START</strong></div>
+              <div class="step-note">APU MASTER → ON · START → PRESS · Wait APU AVAIL · APU GEN → ON.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> ELEC synoptic shows all buses powered · No ELEC ESS / DC BUS cautions</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>2.2 IRS / navigation alignment</h3>
+          <small>IRS / FMS</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">IRS mode selectors L/C/R — <strong>NAV</strong></div>
+              <div class="step-note">Begin alignment on all three units.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">FMS POS INIT — <strong>Set GPS / gate position</strong></div>
+              <div class="step-note">Improves navigation accuracy.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> IRS ALIGN countdown active · No IRS FAULT messages</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>2.3 Fire & warning tests</h3>
+          <small>Safety</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Fire detection test — <strong>PERFORM</strong></div>
+              <div class="step-note">FIRE TEST switch → HOLD · Confirm aural, lights, master warning.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Master warning / caution — <strong>TEST / RESET</strong></div>
+              <div class="step-note">Confirms alerting system operation.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> All test indications extinguish after release</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3: COCKPIT PREPARATION -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 3 — Cockpit preparation</h2>
+        <span>Panels, fuel, hydraulics, air, FMS</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Prep</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>3.1 Fuel panel</h3>
+          <small>FUEL</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Fuel quantity — <strong>CHECK</strong></div>
+              <div class="step-note">Matches planned fuel load.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Fuel pumps — <strong>ON</strong> (tanks with fuel)</div>
+              <div class="step-note">Ensures pressurized feed to engines.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Crossfeed — <strong>AUTO</strong></div>
+              <div class="step-note">Normal MD‑11 configuration.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> FUEL synoptic pumps green · No FUEL PRESS cautions</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>3.2 Hydraulic systems</h3>
+          <small>HYD</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Hydraulic systems 1 / 2 / 3 — <strong>ON</strong></div>
+              <div class="step-note">Pressurize primary flight controls and gear.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Aux hydraulic pump — <strong>ON</strong> (if needed)</div>
+              <div class="step-note">Builds brake pressure on ground if required.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> HYD synoptic pressurized · Brake accumulator in green band</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>3.3 Air conditioning & pneumatics</h3>
+          <small>BLEED / PACKS</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Packs — <strong>AUTO</strong></div>
+              <div class="step-note">Normal cabin conditioning.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Recirc fans — <strong>ON</strong></div>
+              <div class="step-note">Improves airflow and efficiency.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Temperature selectors — <strong>SET</strong></div>
+              <div class="step-note">Cabin and cockpit comfort.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">APU bleed — <strong>ON</strong> (if using APU)</div>
+              <div class="step-note">Provides bleed air for packs and engine start.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> CABIN synoptic stable · No PACK / BLEED cautions</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>3.4 FMS & performance</h3>
+          <small>FMS / PERF</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">FMS IDENT — <strong>CHECK</strong></div>
+              <div class="step-note">AIRAC validity and aircraft type.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">POS INIT — <strong>SET</strong></div>
+              <div class="step-note">Use GPS or gate coordinates.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">ROUTE — <strong>ENTER</strong></div>
+              <div class="step-note">Origin, destination, route, SID/STAR as required.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">PERF INIT — <strong>ENTER</strong></div>
+              <div class="step-note">ZFW, CG, cruise level, cost index, reserves.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> No FMS INCOMPLETE message · VNAV/ATS available</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>3.5 MCP & radios</h3>
+          <small>MCP / COM / NAV</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">COM1/2 — <strong>SET</strong></div>
+              <div class="step-note">ATIS, ground, clearance frequencies.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">NAV1/2 — <strong>SET</strong></div>
+              <div class="step-note">Departure navaids or ILS as needed.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">MCP heading — <strong>RUNWAY / SID</strong></div>
+              <div class="step-note">Runway heading or initial track.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">MCP altitude — <strong>INITIAL CLEARANCE</strong></div>
+              <div class="step-note">Per ATC or SID restriction.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">MCP speed — <strong>V2 (later)</strong></div>
+              <div class="step-note">Set after takeoff performance computed.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> FD ON both sides · ATS ARMED (white)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4: BEFORE START -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 4 — Before start</h2>
+        <span>Doors, pushback, final checks</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Before start</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>4.1 Cabin & doors</h3>
+          <small>Cabin secure</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Doors — <strong>CLOSED & ARMED</strong></div>
+              <div class="step-note">All passenger and cargo doors closed.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Seat belts / no smoking — <strong>ON</strong></div>
+              <div class="step-note">Cabin ready for pushback.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>4.2 Takeoff data</h3>
+          <small>Perf / trim</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">V1 / VR / V2 — <strong>SET</strong></div>
+              <div class="step-note">From performance calculation / FMS.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">MCP speed — <strong>V2</strong></div>
+              <div class="step-note">Set for takeoff.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Stab trim — <strong>SET</strong></div>
+              <div class="step-note">Per FMS / performance sheet.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>4.3 Final checks</h3>
+          <small>Before engine start</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Beacon — <strong>ON</strong></div>
+              <div class="step-note">Signals engine start imminent.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Parking brake — <strong>SET</strong></div>
+              <div class="step-note">Hold aircraft for start / pushback.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Pushback / start clearance — <strong>OBTAINED</strong></div>
+              <div class="step-note">From ATC or ground crew.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> EICAS shows no critical cautions · Ground crew ready</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5: ENGINE START -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 5 — Engine start</h2>
+        <span>FADEC‑controlled start, 2 → 1 → 3</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Start</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>5.1 Preconditions</h3>
+          <small>Before first start</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Hydraulic systems 1 / 2 / 3 — <strong>ON</strong></div>
+              <div class="step-note">Flight controls and brakes powered.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Fuel pumps — <strong>ON</strong></div>
+              <div class="step-note">All tanks with fuel pressurized.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">APU bleed — <strong>ON</strong> (if using APU)</div>
+              <div class="step-note">Provides pneumatic pressure for start.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Packs — <strong>OFF</strong></div>
+              <div class="step-note">Maximizes pneumatic pressure.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Thrust levers — <strong>IDLE</strong></div>
+              <div class="step-note">Prevents unintended thrust.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">ATS — <strong>ARMED</strong></div>
+              <div class="step-note">White indication on FMA.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> No HYD / FUEL / BLEED warnings · Pneumatic pressure ≥ ~30–40 PSI</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>5.2 Engine 2 start</h3>
+          <small>Normal first engine</small>
+        </div>
+        <div class="pill-row">
+          <div class="pill">Normal order: 2 → 1 → 3</div>
+          <div class="pill">FADEC controls fuel</div>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Engine start selector — <strong>ENG 2</strong></div>
+              <div class="step-note">Select center engine.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Engine 2 start switch — <strong>START</strong></div>
+              <div class="step-note">N2 should begin to rotate.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Monitor:</span> N2 rising · At ~15% N2 FADEC introduces fuel · EGT rises · N1 spools</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>5.3 Monitor engine 2</h3>
+          <small>EICAS</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">N2 — <strong>20–50%</strong></div>
+              <div class="step-note">Smooth acceleration, no stagnation.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">EGT — <strong>Within limits</strong></div>
+              <div class="step-note danger">Abort if hot start (rapid EGT rise).</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Oil pressure — <strong>RISING</strong></div>
+              <div class="step-note danger">Abort if no oil pressure.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Abort if:</span> Hot start · Hung start · No oil pressure</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>5.4 Engine 2 stabilized</h3>
+          <small>Idle</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Confirm idle parameters</div>
+              <div class="step-note">N1 ~20–25% · N2 ~60% · EGT stable · Oil pressure green.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Engine start selector — <strong>OFF</strong></div>
+              <div class="step-note">End engine 2 start sequence.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>5.5 Engines 1 and 3</h3>
+          <small>Repeat flow</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Engine 1 — <strong>START</strong></div>
+              <div class="step-note">Selector → ENG 1 · START → Monitor · Selector → OFF when stabilized.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Engine 3 — <strong>START</strong></div>
+              <div class="step-note">Selector → ENG 3 · START → Monitor · Selector → OFF when stabilized.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> All three engines stable at idle · No engine / bleed cautions</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>5.6 After start</h3>
+          <small>Post‑start config</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Packs — <strong>AUTO</strong></div>
+              <div class="step-note">Restore cabin conditioning.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">APU bleed — <strong>OFF</strong></div>
+              <div class="step-note">Engines now supply bleed air.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">APU — <strong>OFF</strong> (after cooldown)</div>
+              <div class="step-note">Shut down when no longer needed.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Aux hydraulic pump — <strong>OFF</strong> (if not required)</div>
+              <div class="step-note">Engine‑driven pumps now supply pressure.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Flight controls — <strong>CHECK</strong></div>
+              <div class="step-note">Full, free, correct movement.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Slats / flaps — <strong>SET FOR T/O</strong></div>
+              <div class="step-note">Per performance / FMS.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> No BLEED / PACK / HYD cautions · Takeoff config OK</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 6: TAXI -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 6 — Taxi</h2>
+        <span>From stand to runway</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Taxi</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>6.1 Taxi out</h3>
+          <small>Initial movement</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Taxi clearance — <strong>OBTAINED</strong></div>
+              <div class="step-note">From ATC or ground.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Taxi lights — <strong>ON</strong></div>
+              <div class="step-note">Indicates movement to others.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Parking brake — <strong>RELEASE</strong></div>
+              <div class="step-note">Begin taxi.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>6.2 During taxi</h3>
+          <small>Checks</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Brakes — <strong>CHECK</strong></div>
+              <div class="step-note">Verify normal braking response.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Nosewheel steering — <strong>CHECK</strong></div>
+              <div class="step-note">Smooth directional control.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Flight instruments — <strong>CHECK</strong></div>
+              <div class="step-note">Heading and track follow taxi path.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 7: BEFORE TAKEOFF -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 7 — Before takeoff</h2>
+        <span>At or near runway</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Before T/O</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>7.1 Final configuration</h3>
+          <small>Takeoff config</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Flaps / slats — <strong>CHECK SET</strong></div>
+              <div class="step-note">Matches planned takeoff setting.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Trim — <strong>CHECK</strong></div>
+              <div class="step-note">Within green band, per performance.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Spoilers — <strong>ARMED</strong></div>
+              <div class="step-note">For automatic deployment on landing / rejected takeoff.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>7.2 Lights & modes</h3>
+          <small>Runway entry</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Landing lights — <strong>ON</strong></div>
+              <div class="step-note">When entering runway.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Strobe lights — <strong>ON</strong></div>
+              <div class="step-note">Indicates runway occupancy.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Transponder — <strong>TA/RA</strong></div>
+              <div class="step-note">Set to ALT / TA‑RA for departure.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> Takeoff config warning — NO WARNING</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 8: TAKEOFF -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 8 — Takeoff</h2>
+        <span>Roll, rotation, initial climb</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Takeoff</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>8.1 Takeoff roll</h3>
+          <small>Runway</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Thrust — <strong>SET T/O</strong></div>
+              <div class="step-note">Use ATS or manual to planned thrust.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">80 kts — <strong>CALLED</strong></div>
+              <div class="step-note">Cross‑check airspeed indications.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">V1 — <strong>CALLED</strong></div>
+              <div class="step-note">Decision speed.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">VR — <strong>ROTATE</strong></div>
+              <div class="step-note">Rotate to target pitch.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>8.2 Initial climb</h3>
+          <small>After liftoff</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Positive rate — <strong>GEAR UP</strong></div>
+              <div class="step-note">On “positive climb” call.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Climb thrust — <strong>SET</strong></div>
+              <div class="step-note">At acceleration altitude, per FMS / procedure.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Flaps — <strong>RETRACT ON SCHEDULE</strong></div>
+              <div class="step-note">Follow FMS / speed schedule.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 9: CLIMB & CRUISE -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 9 — Climb & cruise</h2>
+        <span>Climb checks, cruise monitoring</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Climb / cruise</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>9.1 Climb</h3>
+          <small>After clean‑up</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Landing lights — <strong>OFF</strong> (above transition)</div>
+              <div class="step-note">Per company / local procedures.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Seat belt sign — <strong>AS REQUIRED</strong></div>
+              <div class="step-note">When safe and stable.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>9.2 Cruise</h3>
+          <small>Level at cruise</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Cruise level — <strong>CONFIRM</strong></div>
+              <div class="step-note">Altimeters set to standard / local as appropriate.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Fuel / systems — <strong>MONITOR</strong></div>
+              <div class="step-note">Cross‑check fuel burn, engine parameters, pressurization.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 10: DESCENT & APPROACH -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 10 — Descent & approach</h2>
+        <span>Descent planning, approach setup</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Descent / approach</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>10.1 Descent planning</h3>
+          <small>Top of descent</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Arrival / approach — <strong>SELECT</strong></div>
+              <div class="step-note">STAR and approach in FMS.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Landing data — <strong>SET</strong></div>
+              <div class="step-note">Landing weight, Vref, autobrake.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Altimeters — <strong>SET</strong></div>
+              <div class="step-note">Transition level / local QNH.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>10.2 Approach setup</h3>
+          <small>Before final</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">NAV radios — <strong>SET</strong></div>
+              <div class="step-note">ILS / navaids as required.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">MCP — <strong>SET</strong></div>
+              <div class="step-note">Heading, altitude, approach mode as needed.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Seat belt sign — <strong>ON</strong></div>
+              <div class="step-note">Prepare cabin for landing.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 11: LANDING -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 11 — Landing</h2>
+        <span>Final approach, touchdown, rollout</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Landing</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>11.1 Final approach</h3>
+          <small>Configured to land</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Flaps — <strong>LANDING SETTING</strong></div>
+              <div class="step-note">Per landing performance / FMS.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Gear — <strong>DOWN</strong></div>
+              <div class="step-note">Three green indications.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Landing lights — <strong>ON</strong></div>
+              <div class="step-note">On final approach.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>11.2 Touchdown & rollout</h3>
+          <small>After touchdown</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Spoilers — <strong>DEPLOY</strong> (auto)</div>
+              <div class="step-note">Confirm spoiler deployment.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Reverse thrust — <strong>AS REQUIRED</strong></div>
+              <div class="step-note">Within limits, cancel by ~60 kts.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Braking — <strong>AS REQUIRED</strong></div>
+              <div class="step-note">Manual or autobrake as planned.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 12: AFTER LANDING -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 12 — After landing</h2>
+        <span>Runway vacated, taxi to stand</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">After landing</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>12.1 Cleanup</h3>
+          <small>Runway exit</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Spoilers — <strong>DISARM</strong></div>
+              <div class="step-note">Return speedbrake lever to DOWN.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Flaps — <strong>UP</strong> (or as required)</div>
+              <div class="step-note">Retract after clear of runway.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Landing lights — <strong>OFF</strong></div>
+              <div class="step-note">Taxi lights remain ON.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>12.2 Taxi in</h3>
+          <small>To gate / stand</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Transponder — <strong>STBY</strong> (per ATC)</div>
+              <div class="step-note">After vacating runway.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">APU — <strong>START</strong> (if required)</div>
+              <div class="step-note">For electrical / air at gate.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 13: SHUTDOWN & SECURE -->
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <h2>Phase 13 — Shutdown & secure</h2>
+        <span>Engines off, aircraft secured</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="phase-badge">Shutdown</div>
+        <div class="phase-toggle">▶</div>
+      </div>
+    </div>
+    <div class="phase-body">
+      <div class="section">
+        <div class="section-header">
+          <h3>13.1 Shutdown</h3>
+          <small>At stand</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Parking brake — <strong>SET</strong></div>
+              <div class="step-note">Before engine shutdown.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">External power — <strong>CONNECT</strong> (if available)</div>
+              <div class="step-note">Stable power source at gate.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Thrust levers — <strong>SHUTOFF</strong></div>
+              <div class="step-note">Shut down all engines.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>13.2 Post‑shutdown</h3>
+          <small>Systems</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Seat belt sign — <strong>OFF</strong></div>
+              <div class="step-note">Passengers may disembark.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Fuel pumps — <strong>OFF</strong></div>
+              <div class="step-note">When engines and APU not requiring fuel.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Hydraulic pumps — <strong>OFF</strong></div>
+              <div class="step-note">Depressurize systems as appropriate.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h3>13.3 Secure aircraft</h3>
+          <small>Cold & dark</small>
+        </div>
+        <ul class="steps">
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">APU — <strong>OFF</strong> (if not needed)</div>
+              <div class="step-note">After cool‑down and external power available.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">External power — <strong>AS REQUIRED</strong></div>
+              <div class="step-note">Leave connected or disconnect per turnaround / shutdown.</div>
+            </div>
+          </li>
+          <li class="step">
+            <input type="checkbox">
+            <div class="step-main">
+              <div class="step-label">Battery switches — <strong>OFF</strong> (for full cold & dark)</div>
+              <div class="step-note">Only if aircraft is to be fully powered down.</div>
+            </div>
+          </li>
+        </ul>
+        <div class="verify"><span>Verify:</span> All displays dark (if cold & dark) · Aircraft secured</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function togglePhase(headerEl) {
+    const phase = headerEl.closest('.phase');
+    phase.classList.toggle('open');
+  }
+
+  function setAllPhases(open) {
+    document.querySelectorAll('.phase').forEach(p => {
+      if (open) p.classList.add('open');
+      else p.classList.remove('open');
+    });
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.phase input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+    });
+  }
+</script>
+</body>
+</html>
